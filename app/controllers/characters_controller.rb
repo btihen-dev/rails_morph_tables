@@ -3,7 +3,21 @@ class CharactersController < ApplicationController
 
   # GET /characters or /characters.json
   def index
-    @characters = Character.all
+    @company_filter = params[:company_filter]
+    query = Character
+            .includes(:species)
+            .includes(person_jobs: { job: :company })
+
+    # sort column and direction if present
+    query = query.order("#{params[:column]} #{params[:direction]}") if params[:column].present?
+
+    # filter by copmany name if present
+    if @company_filter.present?
+      query = query
+              .joins(person_jobs: { job: :company })
+              .where('companies.company_name ilike ?', "%#{@company_filter}%")
+    end
+    @characters = query.all
   end
 
   # GET /characters/1 or /characters/1.json
