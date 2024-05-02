@@ -33,7 +33,7 @@
 
         <%= form_with url: characters_path, method: :get,
             data: {
-              controller: "filter-form", filter_form_target: "form" #, turbo_frame: "characters"
+              controller: "filter-form", filter_form_target: "form", turbo_action: 'replace'
             } do |form| %>
           <%= form.text_field :company_filter,
               placeholder: "partial name",
