@@ -2,69 +2,67 @@
   <thead class="sticky-top">
     <tr class="table-primary">
       <th scope="col">
-        <%= sort_link(column: "characters.id", label: "Id", company_filter: @company_filter) %>
-        <%# sort_arrow_for("id") %>
+        Select All
+        <input type="checkbox" id="select-all" data-action="change->filter-form#toggleSelectAll">
       </th>
       <th scope="col">
-        <%= sort_link(column: "first_name", label: "First Name", company_filter: @company_filter) %>
-        <%# sort_arrow_for("first_name") %>
+        ID
+        <%= sort_link(column: "characters.id", label: "Id") %>
       </th>
       <th scope="col">
-        <%= sort_link(column: "last_name", label: "Last Name", company_filter: @company_filter) %>
-        <%# sort_arrow_for("last_name") %>
+        First Name
+        <%= sort_link(column: "first_name", label: "First Name") %>
+        <%= render "filter_form", field_name: :firstname_filter, placeholder: "partial name" %>
       </th>
       <th scope="col">
-        <%= sort_link(column: "gender", label: "Gender", company_filter: @company_filter) %>
-        <%# sort_arrow_for("gender") %>
+        Last Name
+        <%= sort_link(column: "last_name", label: "Last Name") %>
+        <%= render "filter_form", field_name: :lastname_filter, placeholder: "partial name" %>
       </th>
       <th scope="col">
-        <%= sort_link(column: "species.species_name", label: "Species", company_filter: @company_filter) %>
-        <%# sort_arrow_for("species.species_name") %>
+        Gender
+        <%= sort_link(column: "gender", label: "Gender") %>
+        <%= render "dropdown_filter", field_name: :gender_selection, options: Character.distinct.pluck(:gender).compact %>
+      </th>
+      <th scope="col">
+        Species
+        <%= sort_link(column: "species.species_name", label: "Species") %>
+        <%= render "dropdown_filter", field_name: :species_selection, options: Species.pluck(:species_name, :id) %>
       </th>
       <th scope="col">
         Company
-        <%# form_with url: characters_path, method: :get do |form| %>
-          <%# form.button "Filter", class: "btn btn-light btn-sm" %>
-          <%# form.text_field :company_filter,
-                placeholder: "company name",
-                value: params[:company_filter],
-                class: "form-control form-control-sm" %>
-        <%# end %>
-
-        <%= form_with url: characters_path, method: :get,
-            data: {
-              controller: "filter-form", filter_form_target: "form", turbo_action: 'replace'
-            } do |form| %>
-          <%= form.text_field :company_filter,
-              placeholder: "partial name",
-              value: params[:company_filter],
-              class: "form-control form-control-sm",
-              autocomplete: "off",
-              data: { action: "input->filter-form#filter" } %>
-        <% end %>
+        <%= sort_link(column: "companies.company_name", label: "Company") %>
+        <%= render "filter_form", field_name: :company_filter, placeholder: "partial name" %>
       </th>
     </tr>
   </thead>
 
   <tbody class="scrollable-table">
-    <div id="characters">
-    <% characters.each do |character| %>
+    <% @characters.each do |character| %>
       <tr id="<%= dom_id(character) %>">
-        <th scope="row"><%= link_to "#{character.id}", edit_character_path(character) %></th>
+        <td>
+          <%= check_box_tag "selected_rows[]",
+              character.id,
+              @selected_rows.include?(character.id),
+              id: "selected_rows_#{character.id}",
+              data: { action: "change->filter-form#handleRowSelection" }
+          %>
+        </td>
+        <th scope="row"><%= link_to character.id, edit_character_path(character) %></th>
         <td><%= character.first_name %></td>
         <td><%= character.last_name %></td>
         <td><%= character.gender %></td>
         <td><%= character.species.species_name %></td>
         <td class="text-start">
           <ul class="list-unstyled">
-            <% character.person_jobs.each do |person_job| %>
+            <% character.character_jobs.each do |character_job| %>
               <li>
-                <b><%= person_job.job.company.company_name %></b><br>
-                &nbsp; - <%= person_job.job.role %><br>
+                <b><%= character_job.job.company.company_name %></b><br>
+                &nbsp; - <%= character_job.job.role %><br>
                 &nbsp; &nbsp;
                 <em>
-                  (<%= person_job.start_date.strftime("%e %b '%y") %> -
-                    <%= person_job.end_date&.strftime("%e %b '%y") || 'present' %> )
+                  (<%= character_job.start_date.strftime("%e %b '%y") %> -
+                  <%= character_job.end_date&.strftime("%e %b '%y") || 'present' %> )
                 </em>
               </li>
             <% end %>
@@ -72,7 +70,5 @@
         </td>
       </tr>
     <% end %>
-    </div>
   </tbody>
-
 </table>

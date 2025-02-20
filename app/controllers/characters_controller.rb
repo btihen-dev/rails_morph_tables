@@ -3,20 +3,56 @@ class CharactersController < ApplicationController
 
   # GET /characters or /characters.json
   def index
-    @company_filter = params[:company_filter]
+    @selected_rows = params[:selected_rows]&.split(',')&.map(&:to_i) || []
+
     query = Character
             .includes(:species)
-            .includes(person_jobs: { job: :company })
+            .includes(character_jobs: { job: :company })
 
     # sort column and direction if present
-    query = query.order("#{params[:column]} #{params[:direction]}") if params[:column].present?
+    # query = query.order("#{params[:column]} #{params[:direction]}") if params[:column].present?
+    if params[:column].present?
+      query = case params[:column]
+              when 'companies.company_name'
+                # need to group attributes to include in the view
+                query.group(
+                        'characters.id',
+                        'species.id',
+                        'species.species_name',
+                        'character_jobs.id',
+                        'jobs.id',
+                        'companies.id',
+                        # 'character_jobs.start_date',
+                        # 'character_jobs.end_date',
+                        # 'jobs.role',
+                        'companies.company_name'
+                      )
+                      .order("MIN(companies.company_name) #{params[:direction]}")
+              else
+                query.order("#{params[:column]} #{params[:direction]}")
+              end
+    end
 
-    # filter by copmany name if present
+    # Dropdown selections
+    @gender_selection = params[:gender_selection]
+    @species_selection = params[:species_selection]
+
+    query = query.where(gender: @gender_selection) if @gender_selection.present?
+    query = query.where(species_id: @species_selection) if @species_selection.present?
+
+    # filters
+    @company_filter = params[:company_filter]
+    @lastname_filter = params[:lastname_filter]
+    @firstname_filter = params[:firstname_filter]
+    query = query.where('characters.last_name ilike ?', "%#{@lastname_filter}%") if @lastname_filter.present?
+    query = query.where('characters.first_name ilike ?', "%#{@firstname_filter}%") if @firstname_filter.present?
     if @company_filter.present?
       query = query
-              .joins(person_jobs: { job: :company })
+              .joins(character_jobs: { job: :company })
               .where('companies.company_name ilike ?', "%#{@company_filter}%")
     end
+
+    # execute query
     @characters = query.all
   end
 

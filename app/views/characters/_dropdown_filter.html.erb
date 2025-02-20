@@ -1,0 +1,8 @@
+<%= form_with url: characters_path, method: :get,
+    data: { controller: "filter-form", filter_form_target: "form", turbo_action: 'replace' } do |form| %>
+  <%= form.select(field_name,
+    options_for_select([['All', '']] + options, params[field_name]),
+    {},
+    class: "form-select form-select-sm",
+    data: { action: "change->filter-form#filter" }) %>
+<% end %>

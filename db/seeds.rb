@@ -246,73 +246,73 @@ paper_delivery = Job.create!(role: 'paperboy', company: bedrock_news)
 # Grand Poobah
 grand_poobah = Job.create!(role: 'The Grand Poobah', company: buffalo_lodge)
 
-## PersonJobs
+## CharacterJobs
 ##############
 # zeke - San Cemente Owner
-PersonJob.create!(character: zeke, job: cemente, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: zeke, job: cemente, start_date: Date.new(1980, 1, 1))
 # jed - farmer
-PersonJob.create!(character: jed, job: farmer, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: jed, job: farmer, start_date: Date.new(1980, 1, 1))
 # rocky - ww1 soldier
-PersonJob.create!(character: rocky, job: soldier, start_date: Date.new(1980, 1, 1), end_date: Date.new(1985, 12, 31))
+CharacterJob.create!(character: rocky, job: soldier, start_date: Date.new(1980, 1, 1), end_date: Date.new(1985, 12, 31))
 # rocy - pilot after war
-PersonJob.create!(character: rocky, job: pilot, start_date: Date.new(1986, 1, 1))
+CharacterJob.create!(character: rocky, job: pilot, start_date: Date.new(1986, 1, 1))
 
 # giggles rich uncle
-PersonJob.create!(character: giggles, job: wealth, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: giggles, job: wealth, start_date: Date.new(1980, 1, 1))
 
 # pops - freeway traffic reporter
-PersonJob.create!(character: pops, job: traffic, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: pops, job: traffic, start_date: Date.new(1980, 1, 1))
 # edna - homemaker
-PersonJob.create!(character: edna, job: homemaker, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: edna, job: homemaker, start_date: Date.new(1980, 1, 1))
 
 # fred - crane operator
-PersonJob.create!(character: fred, job: crane, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: fred, job: crane, start_date: Date.new(1980, 1, 1))
 # married to fred
 # wilma - reporter & caterer & homemaker
-PersonJob.create!(character: wilma, job: reporter, start_date: Date.new(1980, 1, 1), end_date: Date.new(1989, 12, 31))
-PersonJob.create!(character: wilma, job: caterer, start_date: Date.new(1990, 1, 1))
-PersonJob.create!(character: wilma, job: homemaker, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: wilma, job: reporter, start_date: Date.new(1980, 1, 1), end_date: Date.new(1989, 12, 31))
+CharacterJob.create!(character: wilma, job: caterer, start_date: Date.new(1990, 1, 1))
+CharacterJob.create!(character: wilma, job: homemaker, start_date: Date.new(1980, 1, 1))
 
 # pebbles - advertising executive
-PersonJob.create!(character: pebbles, job: advertising, start_date: Date.new(1995, 1, 1))
+CharacterJob.create!(character: pebbles, job: advertising, start_date: Date.new(1995, 1, 1))
 
 # texrock rangers & rancher (town: texrock)
-PersonJob.create!(character: tex, job: rancher, start_date: Date.new(2080, 1, 1))
+CharacterJob.create!(character: tex, job: rancher, start_date: Date.new(2080, 1, 1))
 
 # mr_slate - manager
-PersonJob.create!(character: mr_slate, job: manager, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: mr_slate, job: manager, start_date: Date.new(1980, 1, 1))
 
 
 ## Rubble family
 # bob - used car salesman
-PersonJob.create!(character: bob, job: salesman, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: bob, job: salesman, start_date: Date.new(1980, 1, 1))
 # flo - (homemaker)
-PersonJob.create!(character: flo, job: homemaker, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: flo, job: homemaker, start_date: Date.new(1980, 1, 1))
 
 # police officer & crane operator at 'Slate Rock & Gravel Company'
-PersonJob.create!(character: barney, job: police, start_date: Date.new(1980, 1, 1), end_date: Date.new(1989, 12, 31))
-PersonJob.create!(character: barney, job: crane, start_date: Date.new(1990, 1, 1))
+CharacterJob.create!(character: barney, job: police, start_date: Date.new(1980, 1, 1), end_date: Date.new(1989, 12, 31))
+CharacterJob.create!(character: barney, job: crane, start_date: Date.new(1990, 1, 1))
 
 # betty - reporter & caterer & homemaker
-PersonJob.create!(character: betty, job: reporter, start_date: Date.new(1980, 1, 1), end_date: Date.new(1989, 12, 31))
-PersonJob.create!(character: betty, job: caterer, start_date: Date.new(1990, 1, 1))
-PersonJob.create!(character: betty, job: homemaker, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: betty, job: reporter, start_date: Date.new(1980, 1, 1), end_date: Date.new(1989, 12, 31))
+CharacterJob.create!(character: betty, job: caterer, start_date: Date.new(1990, 1, 1))
+CharacterJob.create!(character: betty, job: homemaker, start_date: Date.new(1980, 1, 1))
 
 # bamm-bamm - auto mechanic, then screenwriter
-PersonJob.create!(character: bamm, job: mechanic, start_date: Date.new(1995, 1, 1), end_date: Date.new(1999, 12, 31))
-PersonJob.create!(character: bamm, job: screenwriter, start_date: Date.new(2000, 1, 1))
+CharacterJob.create!(character: bamm, job: mechanic, start_date: Date.new(1995, 1, 1), end_date: Date.new(1999, 12, 31))
+CharacterJob.create!(character: bamm, job: screenwriter, start_date: Date.new(2000, 1, 1))
 
 
 ## The Gruesomes
 # weirdly - reality host
-PersonJob.create!(character: weirdly, job: host, start_date: Date.new(1990, 1, 1))
+CharacterJob.create!(character: weirdly, job: host, start_date: Date.new(1990, 1, 1))
 
 ## others
 # joe - fire chief)
-PersonJob.create!(character: joe, job: fire_chief, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: joe, job: fire_chief, start_date: Date.new(1980, 1, 1))
 
 # paperboy (town: bedrock)
-PersonJob.create!(character: arnold, job: paper_delivery, start_date: Date.new(1980, 1, 1))
+CharacterJob.create!(character: arnold, job: paper_delivery, start_date: Date.new(1980, 1, 1))
 
 # Sam Slagheap – The Grand Poobah of the Water Buffalo Lodge.
-PersonJob.create!(character: sam, job: grand_poobah, start_date: Date.new(1985, 1, 1))
+CharacterJob.create!(character: sam, job: grand_poobah, start_date: Date.new(1985, 1, 1))

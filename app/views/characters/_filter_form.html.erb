@@ -1,0 +1,10 @@
+<%= form_with url: characters_path, method: :get,
+    data: { controller: "filter-form", filter_form_target: "form", turbo_action: 'replace' } do |form| %>
+  <%= form.text_field(
+    field_name,
+    placeholder: placeholder,
+    value: params[field_name],
+    class: "form-control form-control-sm",
+    autocomplete: "off",
+    data: { action: "input->filter-form#filter" }) %>
+<% end %>

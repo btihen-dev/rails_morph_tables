@@ -14,6 +14,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_02_200904) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "character_jobs", force: :cascade do |t|
+    t.date "start_date"
+    t.date "end_date"
+    t.bigint "character_id", null: false
+    t.bigint "job_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["character_id"], name: "index_character_jobs_on_character_id"
+    t.index ["job_id"], name: "index_character_jobs_on_job_id"
+  end
+
   create_table "characters", force: :cascade do |t|
     t.string "nick_name"
     t.string "first_name"
@@ -40,25 +51,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_02_200904) do
     t.index ["company_id"], name: "index_jobs_on_company_id"
   end
 
-  create_table "person_jobs", force: :cascade do |t|
-    t.date "start_date"
-    t.date "end_date"
-    t.bigint "character_id", null: false
-    t.bigint "job_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["character_id"], name: "index_person_jobs_on_character_id"
-    t.index ["job_id"], name: "index_person_jobs_on_job_id"
-  end
-
   create_table "species", force: :cascade do |t|
     t.string "species_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "character_jobs", "characters"
+  add_foreign_key "character_jobs", "jobs"
   add_foreign_key "characters", "species"
   add_foreign_key "jobs", "companies"
-  add_foreign_key "person_jobs", "characters"
-  add_foreign_key "person_jobs", "jobs"
 end
