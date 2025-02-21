@@ -56,6 +56,21 @@ class CharactersController < ApplicationController
     @characters = query.all
   end
 
+  def selected
+    @selected = Character.includes(:species)
+                        .includes(character_jobs: { job: :company })
+                        .where(id: params[:selected_rows])
+
+    respond_to do |format|
+      format.html { render :selected }
+      # format.turbo_stream do
+      #   # Force a redirect to a full page
+      #   redirect_to selected_characters_path(selected_rows: params[:selected_rows])
+      # end
+      format.json { render json: @selected }
+    end
+  end
+
   # GET /characters/1 or /characters/1.json
   def show
   end

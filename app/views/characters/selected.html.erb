@@ -1,9 +1,23 @@
 <p style="color: green"><%= notice %></p>
 
-<h1>Characters</h1>
+<h1>Selected Characters</h1>
 
-<%= render "characters", characters: @characters %>
+<%= turbo_frame_tag "selected_characters" do %>
+  <ul class="list-unstyled">
+    <% @selected.each do |character| %>
+      <li class="mb-3">
+        <%= link_to "#{character.first_name} #{character.last_name}", edit_character_path(character) %>
+        (<%= character.species.species_name %>)
+        <% if character.character_jobs.any? %>
+          <ul>
+            <% character.character_jobs.each do |cj| %>
+              <li><%= cj.job.company.company_name %> - <%= cj.job.role %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
 
-<button type="submit">Submit Selected</button>
-
-<%= link_to "New character", new_character_path %>
+<%= link_to "Back to all characters", characters_path, class: "btn btn-primary" %>

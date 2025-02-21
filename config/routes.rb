@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
   resources :jobs
   resources :companies
-  resources :characters
+  resources :characters do
+    collection { post 'selected' }
+  end
   resources :species
+
+  post "/selected", to: "selected#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
