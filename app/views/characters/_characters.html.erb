@@ -38,7 +38,7 @@
   </thead>
 
   <tbody class="scrollable-table">
-    <% @characters.each do |character| %>
+    <% characters.each do |character| %>
       <tr id="<%= dom_id(character) %>">
         <td>
           <%= check_box_tag "selected_rows[]",

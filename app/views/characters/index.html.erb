@@ -2,6 +2,99 @@
 
 <h1>Characters</h1>
 
-<%= render "characters", characters: @characters %>
+<button type="submit">Submit Selected</button>
 
+<div data-controller="filter-form">
+<table class="table table-striped table-hover">
+  <thead class="sticky-top">
+    <tr class="table-primary">
+      <th scope="col">
+        Select
+        <!-- <input type="checkbox" id="select-all" data-action="change->filter-form#toggleSelectAll"> -->
+        <%= check_box_tag "select-all",
+            nil,
+            false,
+            data: {
+              action: "filter-form#toggleSelectAll",
+              "filter-form-target": "selectAll"
+            }
+        %>
+      </th>
+      <th scope="col">
+        ID
+        <%= sort_link(column: "characters.id", label: "Id") %>
+      </th>
+      <th scope="col">
+        First Name
+        <%= sort_link(column: "first_name", label: "First Name") %>
+        <%= render "filter_form", field_name: :firstname_filter, placeholder: "partial name" %>
+      </th>
+      <th scope="col">
+        Last Name
+        <%= sort_link(column: "last_name", label: "Last Name") %>
+        <%= render "filter_form", field_name: :lastname_filter, placeholder: "partial name" %>
+      </th>
+      <th scope="col">
+        Gender
+        <%= sort_link(column: "gender", label: "Gender") %>
+        <%= render "dropdown_filter", field_name: :gender_selection, options: Character.distinct.pluck(:gender).compact %>
+      </th>
+      <th scope="col">
+        Species
+        <%= sort_link(column: "species.species_name", label: "Species") %>
+        <%= render "dropdown_filter", field_name: :species_selection, options: Species.pluck(:species_name, :id) %>
+      </th>
+      <th scope="col">
+        Company
+        <%= sort_link(column: "companies.company_name", label: "Company") %>
+        <%= render "filter_form", field_name: :company_filter, placeholder: "partial name" %>
+      </th>
+    </tr>
+  </thead>
+
+  <tbody class="scrollable-table">
+    <% @characters.each do |character| %>
+      <tr id="<%= dom_id(character) %>">
+        <td>
+          <%= check_box_tag "selected_rows[]",
+              character.id,
+              @selected_rows.include?(character.id),
+              id: "selected_rows_#{character.id}",  # required Explicitly set the ID
+              data: { action: "change->filter-form#handleRowSelection" }
+          %>
+          <%# check_box_tag "selected_rows[]",
+              character.id,
+              params[:selected_rows]&.split(',')&.include?(character.id.to_s),
+              id: "selected_rows_#{character.id}",  # Explicitly set the ID
+              data: { action: "filter-form#handleRowSelection" }
+          %>
+        </td>
+        <th scope="row"><%= link_to character.id, edit_character_path(character) %></th>
+        <td><%= character.first_name %></td>
+        <td><%= character.last_name %></td>
+        <td><%= character.gender %></td>
+        <td><%= character.species.species_name %></td>
+        <td class="text-start">
+          <ul class="list-unstyled">
+            <% character.character_jobs.each do |character_job| %>
+              <li>
+                <b><%= character_job.job.company.company_name %></b><br>
+                &nbsp; - <%= character_job.job.role %><br>
+                &nbsp; &nbsp;
+                <em>
+                  (<%= character_job.start_date.strftime("%e %b '%y") %> -
+                  <%= character_job.end_date&.strftime("%e %b '%y") || 'present' %> )
+                </em>
+              </li>
+            <% end %>
+          </ul>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<button type="submit">Submit Selected</button>
+<br>
 <%= link_to "New character", new_character_path %>

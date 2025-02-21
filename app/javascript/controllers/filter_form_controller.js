@@ -134,7 +134,9 @@
 //   }
 // }
 
+// #############################################
 // // handles all of the above and row selection
+// #############################################
 // import { Controller } from "@hotwired/stimulus";
 
 // export default class extends Controller {
@@ -212,7 +214,9 @@
 //   }
 // }
 
-// // handle row selection persistence
+// // ###################################
+// // // handle row selection persistence
+// // ###################################
 // import { Controller } from "@hotwired/stimulus";
 
 // export default class extends Controller {
@@ -338,29 +342,553 @@
 //   }
 // }
 
-// Mistral - fixes selection
+// // #########################
+// // Mistral - fixes selection
+// // some checkboxes stop responding
+// // #########################
+// import { Controller } from "@hotwired/stimulus";
+
+// export default class extends Controller {
+//   static targets = ["form"];
+
+//   attachEventListeners() {
+//     // Attach event listeners to individual checkboxes
+//     this.checkboxes = document.querySelectorAll(
+//       'input[name="selected_rows[]"]',
+//     );
+//     this.checkboxes.forEach((checkbox) => {
+//       checkbox.addEventListener("change", (event) =>
+//         this.handleRowSelection(event),
+//       );
+//     });
+
+//     // Attach event listeners to sort links
+//     document.querySelectorAll(".sort-link").forEach((link) => {
+//       link.addEventListener("click", (e) => this.handleSort(e));
+//     });
+
+//     // Attach event listener to the "Select All" checkbox
+//     const selectAllCheckbox = document.getElementById("select-all");
+//     if (selectAllCheckbox) {
+//       selectAllCheckbox.addEventListener("change", (event) =>
+//         this.toggleSelectAll(event),
+//       );
+//     }
+//   }
+
+//   connect() {
+//     this.selectedRows = new Set();
+//     // console.log("Form target:", this.formTarget);
+
+//     // Load existing selections from URL
+//     const selectedParam = new URLSearchParams(window.location.search).get(
+//       "selected_rows",
+//     );
+//     if (selectedParam) {
+//       selectedParam.split(",").forEach((id) => this.selectedRows.add(id));
+//     }
+
+//     // Set initial checkbox states
+//     this.updateCheckboxStates();
+
+//     // Manually add checkboxes to the targets
+//     // (checkboxes are otherwise automatically registered in the formTarget list)
+//     this.checkboxes = document.querySelectorAll(
+//       'input[name="selected_rows[]"]',
+//     );
+//     this.checkboxes.forEach((checkbox) => {
+//       checkbox.addEventListener("change", (event) =>
+//         this.handleRowSelection(event),
+//       );
+//     });
+
+//     // Manually attach "Select All" listener for the same reason as above
+//     const selectAllCheckbox = document.getElementById("select-all");
+//     if (selectAllCheckbox) {
+//       selectAllCheckbox.addEventListener("change", (event) =>
+//         this.toggleSelectAll(event),
+//       );
+//     }
+
+//     // Add sort link handlers
+//     document.querySelectorAll(".sort-link").forEach((link) => {
+//       link.addEventListener("click", (e) => this.handleSort(e));
+//     });
+//   }
+
+//   toggleSelectAll(event) {
+//     const isChecked = event.target.checked;
+//     const visibleCheckboxes = document.querySelectorAll(
+//       'input[name="selected_rows[]"]:not([style*="display: none"])',
+//     );
+
+//     // Clear existing selections
+//     this.selectedRows.clear();
+
+//     visibleCheckboxes.forEach((checkbox) => {
+//       checkbox.checked = isChecked;
+//       if (isChecked) {
+//         this.selectedRows.add(checkbox.value);
+//       }
+//     });
+
+//     this.updateUrlParams();
+//   }
+
+//   // Update UI to reflect stored selections
+//   updateCheckboxStates() {
+//     document
+//       .querySelectorAll('input[name="selected_rows[]"]')
+//       .forEach((checkbox) => {
+//         checkbox.checked = this.selectedRows.has(checkbox.value);
+//       });
+//   }
+
+//   // Handle row selection
+//   handleRowSelection(event) {
+//     console.log("Row selection changed");
+//     const checkbox = event.target;
+
+//     if (checkbox.checked) {
+//       this.selectedRows.add(checkbox.value);
+//     } else {
+//       this.selectedRows.delete(checkbox.value);
+//     }
+
+//     // Update URL with selected rows
+//     this.updateUrlParams();
+//   }
+
+//   updateUrlParams() {
+//     const currentParams = new URLSearchParams(window.location.search);
+//     if (this.selectedRows.size > 0) {
+//       currentParams.set(
+//         "selected_rows",
+//         Array.from(this.selectedRows).join(","),
+//       );
+//     } else {
+//       currentParams.delete("selected_rows");
+//     }
+
+//     const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+//     window.history.replaceState({}, "", newUrl);
+//   }
+
+//   handleSort(event) {
+//     console.log("Sort link clicked");
+//     event.preventDefault();
+//     const link = event.currentTarget;
+//     const url = new URL(link.href);
+//     const currentParams = new URLSearchParams(window.location.search);
+//     const newParams = new URLSearchParams(url.search);
+
+//     // Preserve all filters and existing parameters except sorting ones
+//     currentParams.forEach((value, key) => {
+//       if (key !== "column" && key !== "direction") {
+//         newParams.set(key, value);
+//       }
+//     });
+
+//     // Ensure selections persist
+//     if (this.selectedRows.size > 0) {
+//       newParams.set("selected_rows", Array.from(this.selectedRows).join(","));
+//     }
+
+//     Turbo.visit(`${window.location.pathname}?${newParams.toString()}`, {
+//       action: "replace",
+//     }).then(() => {
+//       this.updateCheckboxStates();
+//       // this.attachEventListeners(); // Re-attach event listeners
+//     });
+//   }
+
+//   filter(event) {
+//     clearTimeout(this.timeout);
+//     this.timeout = setTimeout(() => {
+//       const currentParams = new URLSearchParams(window.location.search);
+//       const formData = new FormData(event.target.form);
+
+//       // Preserve all existing parameters
+//       currentParams.forEach((value, key) => {
+//         if (!formData.has(key) && key !== "column" && key !== "direction") {
+//           formData.append(key, value);
+//         }
+//       });
+
+//       // Preserve sort parameters
+//       if (currentParams.has("column")) {
+//         formData.append("column", currentParams.get("column"));
+//         formData.append("direction", currentParams.get("direction"));
+//       }
+
+//       // Ensure selections are included only once
+//       if (this.selectedRows.size > 0) {
+//         formData.set("selected_rows", Array.from(this.selectedRows).join(","));
+//       }
+
+//       const searchParams = new URLSearchParams(formData);
+
+//       Turbo.visit(`${window.location.pathname}?${searchParams.toString()}`, {
+//         action: "replace",
+//       }).then(() => {
+//         this.updateCheckboxStates();
+//         this.attachEventListeners(); // Re-attach event listeners
+//       });
+//     }, 300);
+//   }
+// }
+
+// // // #############################
+// // // some checkboxes stop responding
+// // // #############################
+// import { Controller } from "@hotwired/stimulus";
+
+// export default class extends Controller {
+//   static targets = ["form"];
+
+//   attachEventListeners() {
+//     // Attach event listeners to individual checkboxes
+//     this.checkboxes = document.querySelectorAll(
+//       'input[name="selected_rows[]"]',
+//     );
+//     this.checkboxes.forEach((checkbox) => {
+//       checkbox.addEventListener("change", (event) =>
+//         this.handleRowSelection(event),
+//       );
+//     });
+
+//     // Attach event listeners to sort links
+//     document.querySelectorAll(".sort-link").forEach((link) => {
+//       link.addEventListener("click", (e) => this.handleSort(e));
+//     });
+
+//     // Attach event listener to the "Select All" checkbox
+//     const selectAllCheckbox = document.getElementById("select-all");
+//     if (selectAllCheckbox) {
+//       selectAllCheckbox.addEventListener("change", (event) =>
+//         this.toggleSelectAll(event),
+//       );
+//     }
+//   }
+
+//   connect() {
+//     this.selectedRows = new Set();
+
+//     // Load existing selections from URL
+//     const selectedParam = new URLSearchParams(window.location.search).get(
+//       "selected_rows",
+//     );
+//     if (selectedParam) {
+//       selectedParam.split(",").forEach((id) => this.selectedRows.add(id));
+//     }
+
+//     // Set initial checkbox states
+//     this.updateCheckboxStates();
+
+//     // Attach event listeners
+//     // this.attachEventListeners();
+//   }
+
+//   toggleSelectAll(event) {
+//     const isChecked = event.target.checked;
+//     const visibleCheckboxes = document.querySelectorAll(
+//       'input[name="selected_rows[]"]:not([style*="display: none"])',
+//     );
+
+//     // Clear existing selections
+//     this.selectedRows.clear();
+
+//     visibleCheckboxes.forEach((checkbox) => {
+//       checkbox.checked = isChecked;
+//       if (isChecked) {
+//         this.selectedRows.add(checkbox.value);
+//       }
+//     });
+
+//     this.updateUrlParams();
+//   }
+
+//   updateCheckboxStates() {
+//     document
+//       .querySelectorAll('input[name="selected_rows[]"]')
+//       .forEach((checkbox) => {
+//         checkbox.checked = this.selectedRows.has(checkbox.value);
+//       });
+//   }
+
+//   handleRowSelection(event) {
+//     const checkbox = event.target;
+
+//     if (checkbox.checked) {
+//       this.selectedRows.add(checkbox.value);
+//     } else {
+//       this.selectedRows.delete(checkbox.value);
+//     }
+
+//     this.updateUrlParams();
+//   }
+
+//   updateUrlParams() {
+//     const currentParams = new URLSearchParams(window.location.search);
+//     if (this.selectedRows.size > 0) {
+//       currentParams.set(
+//         "selected_rows",
+//         Array.from(this.selectedRows).join(","),
+//       );
+//     } else {
+//       currentParams.delete("selected_rows");
+//     }
+
+//     const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+//     window.history.replaceState({}, "", newUrl);
+//   }
+
+//   handleSort(event) {
+//     event.preventDefault();
+//     const link = event.currentTarget;
+//     const url = new URL(link.href);
+//     const currentParams = new URLSearchParams(window.location.search);
+//     const newParams = new URLSearchParams(url.search);
+
+//     currentParams.forEach((value, key) => {
+//       if (key !== "column" && key !== "direction") {
+//         newParams.set(key, value);
+//       }
+//     });
+
+//     if (this.selectedRows.size > 0) {
+//       newParams.set("selected_rows", Array.from(this.selectedRows).join(","));
+//     }
+
+//     Turbo.visit(`${window.location.pathname}?${newParams.toString()}`, {
+//       action: "replace",
+//     }).then(() => {
+//       this.updateCheckboxStates();
+//       // this.attachEventListeners(); // Re-attach event listeners
+//     });
+//   }
+
+//   filter(event) {
+//     clearTimeout(this.timeout);
+//     this.timeout = setTimeout(() => {
+//       const currentParams = new URLSearchParams(window.location.search);
+//       const formData = new FormData(event.target.form);
+
+//       // Preserve all existing parameters
+//       currentParams.forEach((value, key) => {
+//         if (!formData.has(key) && key !== "column" && key !== "direction") {
+//           formData.append(key, value);
+//         }
+//       });
+
+//       // Preserve sort parameters
+//       if (currentParams.has("column")) {
+//         formData.append("column", currentParams.get("column"));
+//         formData.append("direction", currentParams.get("direction"));
+//       }
+
+//       // Ensure selections are included only once
+//       if (this.selectedRows.size > 0) {
+//         formData.set("selected_rows", Array.from(this.selectedRows).join(","));
+//       }
+
+//       const searchParams = new URLSearchParams(formData);
+
+//       Turbo.visit(`${window.location.pathname}?${searchParams.toString()}`, {
+//         action: "replace",
+//       }).then(() => {
+//         this.updateCheckboxStates();
+//         // this.attachEventListeners(); // Re-attach event listeners
+//       });
+//     }, 300);
+//   }
+// }
+
+// // Claude fix for disabled checkboxes
+// //Let's revert back to a working version but clean it up. The issue might be with the Stimulus targets. Let's simplify this and use just the actions:
+// import { Controller } from "@hotwired/stimulus";
+
+// export default class extends Controller {
+//   static targets = ["form"];
+
+//   connect() {
+//     this.selectedRows = new Set();
+
+//     // Load existing selections from URL
+//     const selectedParam = new URLSearchParams(window.location.search).get(
+//       "selected_rows",
+//     );
+//     if (selectedParam) {
+//       selectedParam.split(",").forEach((id) => this.selectedRows.add(id));
+//     }
+
+//     this.updateCheckboxStates();
+
+//     // Add sort link handlers
+//     document.querySelectorAll(".sort-link").forEach((link) => {
+//       link.addEventListener("click", (e) => this.handleSort(e));
+//     });
+//   }
+
+//   updateCheckboxStates() {
+//     document
+//       .querySelectorAll('input[name="selected_rows[]"]')
+//       .forEach((checkbox) => {
+//         checkbox.checked = this.selectedRows.has(checkbox.value);
+//       });
+
+//     // Update select-all checkbox state
+//     const selectAllCheckbox = document.getElementById("select-all");
+//     if (selectAllCheckbox) {
+//       const visibleCheckboxes = document.querySelectorAll(
+//         'input[name="selected_rows[]"]:not([style*="display: none"])',
+//       );
+//       selectAllCheckbox.checked =
+//         visibleCheckboxes.length > 0 &&
+//         Array.from(visibleCheckboxes).every((cb) => cb.checked);
+//     }
+//   }
+
+//   toggleSelectAll(event) {
+//     const isChecked = event.currentTarget.checked;
+//     const visibleCheckboxes = document.querySelectorAll(
+//       'input[name="selected_rows[]"]:not([style*="display: none"])',
+//     );
+
+//     visibleCheckboxes.forEach((checkbox) => {
+//       checkbox.checked = isChecked;
+//       if (isChecked) {
+//         this.selectedRows.add(checkbox.value);
+//       } else {
+//         this.selectedRows.delete(checkbox.value);
+//       }
+//     });
+
+//     this.updateUrlParams();
+//   }
+
+//   handleRowSelection(event) {
+//     const checkbox = event.currentTarget;
+
+//     if (checkbox.checked) {
+//       this.selectedRows.add(checkbox.value);
+//     } else {
+//       this.selectedRows.delete(checkbox.value);
+//     }
+
+//     this.updateUrlParams();
+//     this.updateCheckboxStates(); // Update select-all state
+//   }
+
+//   updateUrlParams() {
+//     const currentParams = new URLSearchParams(window.location.search);
+//     if (this.selectedRows.size > 0) {
+//       currentParams.set(
+//         "selected_rows",
+//         Array.from(this.selectedRows).join(","),
+//       );
+//     } else {
+//       currentParams.delete("selected_rows");
+//     }
+
+//     const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+//     window.history.replaceState({}, "", newUrl);
+//   }
+
+//   handleSort(event) {
+//     event.preventDefault();
+//     const link = event.currentTarget;
+//     const url = new URL(link.href);
+//     const currentParams = new URLSearchParams(window.location.search);
+//     const newParams = new URLSearchParams(url.search);
+
+//     currentParams.forEach((value, key) => {
+//       if (key !== "column" && key !== "direction") {
+//         newParams.set(key, value);
+//       }
+//     });
+
+//     if (this.selectedRows.size > 0) {
+//       newParams.set("selected_rows", Array.from(this.selectedRows).join(","));
+//     }
+
+//     Turbo.visit(`${window.location.pathname}?${newParams.toString()}`, {
+//       action: "replace",
+//     }).then(() => {
+//       this.updateCheckboxStates();
+//     });
+//   }
+
+//   filter(event) {
+//     clearTimeout(this.timeout);
+//     this.timeout = setTimeout(() => {
+//       const currentParams = new URLSearchParams(window.location.search);
+//       const formData = new FormData(event.target.form);
+
+//       currentParams.forEach((value, key) => {
+//         if (!formData.has(key) && key !== "column" && key !== "direction") {
+//           formData.append(key, value);
+//         }
+//       });
+
+//       if (currentParams.has("column")) {
+//         formData.append("column", currentParams.get("column"));
+//         formData.append("direction", currentParams.get("direction"));
+//       }
+
+//       if (this.selectedRows.size > 0) {
+//         formData.set("selected_rows", Array.from(this.selectedRows).join(","));
+//       }
+
+//       const searchParams = new URLSearchParams(formData);
+
+//       Turbo.visit(`${window.location.pathname}?${searchParams.toString()}`, {
+//         action: "replace",
+//       }).then(() => {
+//         this.updateCheckboxStates();
+//       });
+//     }, 300);
+//   }
+// }
+
+// // #############################
+// // checkboxes work after filters but sorting clears selected rows
+// // reregister sorting after each action otherwise we loose all selected rows with each sort.
+// // #############################
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
   static targets = ["form"];
 
   attachEventListeners() {
-    document
-      .querySelectorAll('input[name="selected_rows[]"]')
-      .forEach((checkbox) => {
-        checkbox.addEventListener("change", (event) =>
-          this.handleRowSelection(event),
-        );
-      });
+    // // Attach event listeners to individual checkboxes not needed with the table div
+    // // <div data-controller="filter-form">
+    // this.checkboxes = document.querySelectorAll(
+    //   'input[name="selected_rows[]"]',
+    // );
+    // this.checkboxes.forEach((checkbox) => {
+    //   checkbox.addEventListener("change", (event) =>
+    //     this.handleRowSelection(event),
+    //   );
+    // });
 
+    // Attach event listeners to sort links - otherwise we loose all selected rows with each sort.
     document.querySelectorAll(".sort-link").forEach((link) => {
       link.addEventListener("click", (e) => this.handleSort(e));
     });
+
+    // // Attach event listener to the "Select All" checkbox - not needed with table div
+    // <div data-controller="filter-form">
+    // const selectAllCheckbox = document.getElementById("select-all");
+    // if (selectAllCheckbox) {
+    //   selectAllCheckbox.addEventListener("change", (event) =>
+    //     this.toggleSelectAll(event),
+    //   );
+    // }
   }
 
   connect() {
     this.selectedRows = new Set();
-    console.log("Form target:", this.formTarget);
 
     // Load existing selections from URL
     const selectedParam = new URLSearchParams(window.location.search).get(
@@ -373,60 +901,44 @@ export default class extends Controller {
     // Set initial checkbox states
     this.updateCheckboxStates();
 
-    // Manually target checkboxes (they are otherwise not listed in the formTarget)
-    this.checkboxes = document.querySelectorAll(
-      'input[name="selected_rows[]"]',
-    );
-    this.checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", (event) =>
-        this.handleRowSelection(event),
-      );
-    });
-
-    // Manually attach "Select All" listener
-    const selectAllCheckbox = document.getElementById("select-all");
-    if (selectAllCheckbox) {
-      selectAllCheckbox.addEventListener("change", (event) =>
-        this.toggleSelectAll(event),
-      );
-    }
-
-    // Add sort link handlers
-    document.querySelectorAll(".sort-link").forEach((link) => {
-      link.addEventListener("click", (e) => this.handleSort(e));
-    });
+    // Attach event listeners
+    this.attachEventListeners();
   }
 
-  toggleSelectAll(event) {
-    const isChecked = event.target.checked;
-    const visibleCheckboxes = document.querySelectorAll(
-      'input[name="selected_rows[]"]:not([style*="display: none"])',
-    );
-
-    visibleCheckboxes.forEach((checkbox) => {
-      checkbox.checked = isChecked;
-      if (isChecked) {
-        this.selectedRows.add(checkbox.value);
-      } else {
-        this.selectedRows.delete(checkbox.value);
-      }
-    });
-
-    this.updateUrlParams();
-  }
-
-  // Update UI to reflect stored selections
   updateCheckboxStates() {
+    // Mark checkboxes as checked/unchecked based on our selectedRows
     document
       .querySelectorAll('input[name="selected_rows[]"]')
       .forEach((checkbox) => {
         checkbox.checked = this.selectedRows.has(checkbox.value);
       });
+
+    this.updateSelectAllState();
   }
 
-  // Handle row selection
+  // selects all visible checkboxes
+  // select all avoids duplicate selections
+  // deselects all visible checkboxes
+  updateSelectAllState() {
+    // If all visible items are selected, check the "select-all" box
+    // otherwise uncheck it
+    const allVisible = [
+      ...document.querySelectorAll('input[name="selected_rows[]"]'),
+    ];
+    const allVisibleIds = new Set(allVisible.map((cb) => cb.value));
+    const howManyVisibleSelected = [...this.selectedRows].filter((id) =>
+      allVisibleIds.has(id),
+    );
+
+    const selectAllCheckbox = document.getElementById("select-all");
+    if (selectAllCheckbox) {
+      selectAllCheckbox.checked =
+        howManyVisibleSelected.length > 0 &&
+        howManyVisibleSelected.length === allVisible.length;
+    }
+  }
+
   handleRowSelection(event) {
-    console.log("Row selection changed");
     const checkbox = event.target;
 
     if (checkbox.checked) {
@@ -435,12 +947,41 @@ export default class extends Controller {
       this.selectedRows.delete(checkbox.value);
     }
 
-    // Update URL with selected rows
+    this.updateUrlParams();
+    // Optionally update "select-all" checkbox
+    this.updateSelectAllState();
+  }
+
+  toggleSelectAll(event) {
+    const isChecked = event.target.checked;
+
+    // All currently visible row checkboxes
+    const visibleCheckboxes = document.querySelectorAll(
+      'input[name="selected_rows[]"]',
+    );
+
+    if (isChecked) {
+      // **Add** all visible items to the set (union),
+      // so we don't remove previously selected ones outside the current filter.
+      visibleCheckboxes.forEach((checkbox) => {
+        checkbox.checked = true;
+        this.selectedRows.add(checkbox.value);
+      });
+    } else {
+      // **Remove** all visible items from the set (difference).
+      // This keeps hidden items that were selected in other filters.
+      visibleCheckboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+        this.selectedRows.delete(checkbox.value);
+      });
+    }
+
     this.updateUrlParams();
   }
 
   updateUrlParams() {
     const currentParams = new URLSearchParams(window.location.search);
+
     if (this.selectedRows.size > 0) {
       currentParams.set(
         "selected_rows",
@@ -455,21 +996,18 @@ export default class extends Controller {
   }
 
   handleSort(event) {
-    console.log("Sort link clicked");
     event.preventDefault();
     const link = event.currentTarget;
     const url = new URL(link.href);
     const currentParams = new URLSearchParams(window.location.search);
     const newParams = new URLSearchParams(url.search);
 
-    // Preserve all filters and existing parameters except sorting ones
     currentParams.forEach((value, key) => {
       if (key !== "column" && key !== "direction") {
         newParams.set(key, value);
       }
     });
 
-    // Ensure selections persist
     if (this.selectedRows.size > 0) {
       newParams.set("selected_rows", Array.from(this.selectedRows).join(","));
     }
@@ -478,10 +1016,10 @@ export default class extends Controller {
       action: "replace",
     }).then(() => {
       this.updateCheckboxStates();
+      this.attachEventListeners(); // Re-attach event listeners
     });
   }
 
-  // needs to reattach event listeners for some reason (not sorting)
   filter(event) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
@@ -501,12 +1039,9 @@ export default class extends Controller {
         formData.append("direction", currentParams.get("direction"));
       }
 
-      // Ensure selections are included
+      // Ensure selections are included only once
       if (this.selectedRows.size > 0) {
-        formData.append(
-          "selected_rows",
-          Array.from(this.selectedRows).join(","),
-        );
+        formData.set("selected_rows", Array.from(this.selectedRows).join(","));
       }
 
       const searchParams = new URLSearchParams(formData);
